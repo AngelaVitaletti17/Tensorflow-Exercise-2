@@ -1,10 +1,11 @@
 import tensorflow as tf
+import numpy as np
 
 #This lesson starts with more fundamentals and will consist of various notes
  
- '''
- This practice comes from a website called Medium.comes
- '''
+'''
+This practice comes from a website called Medium.comes
+'''
  
 #Let's begin with some notes
 '''
@@ -36,7 +37,7 @@ Variable - These are used to show the optimal values that optimize our regressio
 x = tf.placeholder(tf.float32, [None, 1]) 	#This will be house size
 W = tf.Variable(tf.zeros([1,1])) 			#W is the coefficient in front of x. It is the slope
 b = tf.Variable(tf.zeros([1]))				#Y intercept, at least in this example
-y = tf.matmul(x,W)+basestring				#The actual function
+y = tf.matmul(x,W)+b						#The actual function
 
 y_ = tf.placeholder(tf.float32, [None,1]) 	#Represent a place to hold data that we will give to the model, in this case, house prices
 cost = tf.reduce_sum(tf.pow((y_-y),2))		#Calculate the sum of the the difference of the actual data point and the best-fit point, squared
@@ -44,3 +45,35 @@ cost = tf.reduce_sum(tf.pow((y_-y),2))		#Calculate the sum of the the difference
 for i in range(100):						#We're going to create some data; we don't have any
 	x_f = np.array([[i]])
 	y_f = np.array([[2*i]])
+	
+#Now we're going to train!
+train = tf.train.GradientDescentOptimizer(0.00001).minimize(cost)	#This is how the gradient descent is preformed. The value inside the parentheses is the length of the step, the learning rate!
+init = tf.global_variables_initializer() 							#The guide uses a different function, but apparently that has been deprecated
+sess = tf.Session()													#Init the session
+sess.run(init)														#Run init
+
+#Now we also need to actually train using the session
+for i in range(100):												#We're going to create some data; we don't have any
+	x_f = np.array([[i]])
+	y_f = np.array([[2*i]])
+	feed = {x: x_f, y_: y_f}
+	sess.run(train, feed_dict=feed)
+
+	#Print out some stuff
+	if i == 0 or i == 1:
+		print("After %d iteration:" %i)
+	else:
+		print("After %d iterations:" %i)
+	print("W: %f" % sess.run(W))
+	print("b: %f" % sess.run(b))
+
+sess.close()
+
+'''
+Some closing notes...
+
+So, what this is doing is telling us the linear regression, the line of best fit.
+It is slowly learning, based on the makeshift values that we gave it, what the
+optimal values are in 'connecting the dots,' if you will. We have essentially
+found a function that will help us to find the house price based on the size.
+'''
